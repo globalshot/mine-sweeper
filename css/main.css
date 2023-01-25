@@ -1,0 +1,29 @@
+body{
+    background-color: grey;
+}
+table{
+    margin: 20px auto;
+}
+tr, td{
+    text-align: center;
+    background-color: white;
+    border-radius: 5px;
+    border-color: black;
+    height: 30px;
+    width: 30px;
+}
+footer{
+    position: fixed;
+    bottom: 0;
+    left: 20px;
+    font-size: 20px;
+}
+div.lives_left h2{
+    margin: 50px auto 20px;
+    text-align: center;
+}
+span{
+    font-size: 30px;
+    color: red;
+    background-color: rgb(83, 59, 138);
+}
