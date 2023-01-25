@@ -1,22 +1,14 @@
 
 
 const FLAG = '🚩'//
-// const BOMB = '&#1F4A3'//💣
 const BOMB = '💣'
 const UNCLICKED = '?'
-/*
-gBoard – A Matrix 
-containing cell objects: 
-Each cell: { 
-    minesAroundCount: 4, 
-    isShown: false, 
-    isMine: false, 
-    isMarked: true 
-    
-}
-*/
+const HAPPY = '😄'
+const SAD = '💀'
+const WINNER = '🤗'
+
 var gBoard
-var gLevel = {//in further steps, make it change by diff
+var gLevel = {
     SIZE: 4,
     Mines: 2,
     Flags: 2,
@@ -52,46 +44,9 @@ function buildBoard() {//first we check i made a board
             }
         }
     }
-    // for (var i = 0; i < gLevel.Mines; i) {//generate bombs at random places
-    //     var iIdx = getRandomInt(0, gLevel.SIZE - 1)
-    //     var jIdx = getRandomInt(0, gLevel.SIZE - 1)
-    //     var cell = board[iIdx][jIdx]
-    //     if (!cell.isMine && cell.isShown === false) {
-    //         cell.isMine = true
-    //         console.log(iIdx, jIdx);
-    //         i++
-    //     }
-    // }
-    // for (var i = 0; i < gLevel.SIZE; i++) {
-    //     for (var j = 0; j < gLevel.SIZE; j++) {
-    //         if (!board[i][j].isMine) {
-    //             var bombsCount = setMinesNegsCount(board, i, j)
-    //             board[i][j].minesAroundCount = bombsCount
-    //             // console.log(bombsCount);
-    //         }
-    //     }
-    // }
+
     return board
 }
-
-// function savedRenderBoard(mat, selector) {
-//     var strHTML = ''
-//     for (let i = 0; i < gLevel.SIZE; i++) {
-//         strHTML += '<tr>'
-//         for (let j = 0; j < gLevel.SIZE; j++) {
-//             if (!mat[i][j].isMine){
-//             var cell = mat[i][j].minesAroundCount
-//             }
-//             else var cell = `${BOMB}`
-//             var className = `cell cell-${i}-${j}`
-//             // strHTML += `<td class="${className}"><button onclick="onCellClicked(this, ${i}, ${j})">${cell}</button></td>`
-//             strHTML += `<td class="${className}" onclick="onCellClicked(this, ${i}, ${j})">${cell}</td>`
-//         }
-//         strHTML += '</tr>'
-//     }
-//     const elBoard = document.querySelector(selector)
-//     elBoard.innerHTML = strHTML
-// }
 
 function renderBoard(mat, selector) {// the selector is where do i place this matrix
     //render the board as table
@@ -143,13 +98,9 @@ function nameItSomehow(ev, elCell) {
     }
 }
 function showLives() {
-    var elDiv = document.querySelector('span')
+    var elDiv = document.querySelector('div.lives_left h2 span')
     elDiv.innerHTML = `${gGame.lives} lives left`
 }
-
-//i want switch, for 2 different things, 1 for right click, for flag,
-//another is the left click, which shows the cells
-
 //used to be function onCellClicked(elCell, iIdx, jIdx)
 function onCellClicked(elCell) {
     // console.log(elCell);
@@ -193,6 +144,8 @@ function onCellClicked(elCell) {
     if (gBoard[iIdx][jIdx].isMine === false) {
         elCell.innerHTML = gBoard[iIdx][jIdx].minesAroundCount
         gGame.correct++
+        var emoji = document.querySelector('div.alive_or_dead h2')
+        emoji.innerHTML = HAPPY
         if (gBoard[iIdx][jIdx].minesAroundCount===0) {
             openAroundCells(iIdx, jIdx)
             console.log('opened few');
@@ -203,6 +156,8 @@ function onCellClicked(elCell) {
         elCell.innerHTML = `${BOMB}`
         gGame.lives--
         showLives()
+        var emoji = document.querySelector('div.alive_or_dead h2')
+        emoji.innerHTML = SAD
         //check if game over
     }
     console.log("count", gGame.correct);
@@ -218,9 +173,6 @@ function openAroundCells(iIdx, jIdx) {//trolling me, adding count for nothing :(
         for (var j = jIdx - 1; j <= jIdx + 1; j++) {
             if (i === iIdx && j === jIdx) continue//doesnt check himself
             if (j < 0 || j >= gLevel.SIZE) continue//top/bot side not out of bounds
-            //you need get this specific slot and change it
-            //just got the idea of data
-            //each td got data i and data j
             if (gBoard[i][j].isMine===true||gBoard[i][j].isShown===true) continue
             var selectorStr = `[data-i="${i}"][data-j="${j}"]`
             var elCell = document.querySelector(selectorStr)
@@ -253,16 +205,17 @@ function OnCellMarked(elCell) {
     checkGameOver()
 }
 function checkGameOver() {
-    if (gGame.correct === gLevel.SafeCells && gLevel.Flags === 0) {//found all correct cells
+    if (gGame.correct === gLevel.SafeCells) {//found all correct cells
         win()
     }
     if (gGame.lives === 0) {//no lives left
         lose()
     }
 }
-function win() {//you still need stop the time interval
+function win() {//TODO you still need stop the time interval
     //have to make it
-    console.log('won')
+    var emoji = document.querySelector('div.alive_or_dead h2')
+    emoji.innerHTML = WINNER
     alert('win')
 }
 function lose() {
@@ -278,7 +231,10 @@ function newGame() {
     gGame.secPassed = 0
     gGame.lives = 3
     gGame.correct = 0
+    gBoard = []
 
+    var emoji = document.querySelector('div.alive_or_dead h2')
+    emoji.innerHTML = HAPPY
     onInit()
 }
 

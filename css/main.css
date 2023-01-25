@@ -18,11 +18,15 @@ footer{
     left: 20px;
     font-size: 20px;
 }
-div.lives_left h2{
-    margin: 50px auto 20px;
+div.alive_or_dead h2{
+    margin: 50px auto 10px;
     text-align: center;
 }
-span{
+div.lives_left h2{
+    margin: 10px auto 20px;
+    text-align: center;
+}
+div.lives_left h2 span{
     font-size: 30px;
     color: red;
     background-color: rgb(83, 59, 138);

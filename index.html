@@ -13,10 +13,11 @@
 
 <body onload="onInit()">
     <h1>my mine sweeper</h1>
-    <button onclick="changeDiff(1)">easy</button>
-    <button onclick="changeDiff(2)">medium</button>
+    <button onclick="changeDiff(1)">easy</button><br>
+    <button onclick="changeDiff(2)">medium</button><br>
     <button onclick="changeDiff(3)">hard</button>
-    <div class="lives_left"><h2><span>s</span></h2></div>
+    <div class="alive_or_dead"><h2 onclick="newGame()">😄</h2></div>
+    <div class="lives_left"><h2><span></span></h2></div>
     <table>
         <tbody class="board"></tbody>
     </table>
