@@ -32,6 +32,7 @@ function onInit() {
     gBoard = buildBoard()
     showLives()
     showFlags()
+    showSafe()
     renderBoard(gBoard, '.board')
 }
 
@@ -152,8 +153,12 @@ function showFlags() {
     elSpan.innerHTML = `flags left: ${gLevel.Flags}`
 }
 function showHints() {
-    var elSpan = document.querySelector('button.hints')
-    elSpan.innerText = `hints: ${gGame.hints}`
+    var elBtn = document.querySelector('button.hints')
+    elBtn.innerText = `hints: ${gGame.hints}`
+}
+function showSafe() {
+    var elBtn = document.querySelector('button.safe')
+    elBtn.innerText = `safe clicks: ${gGame.safeClicks}`
 }
 //used to be function onCellClicked(elCell, iIdx, jIdx)
 function onCellClicked(elCell) {
@@ -310,6 +315,11 @@ function hint() {
 }
 function safeClick() {//while loop, random i and j, check if cell bomb or opened, timer of 1 sec to show
     if (gGame.isOn === false) return
+    if (gGame.safeClicks<=0) {
+        return
+    }
+    gGame.safeClicks--
+    showSafe()
     while (true) {
         var i = getRandomInt(0, gLevel.SIZE - 1)
         var j = getRandomInt(0, gLevel.SIZE - 1)
@@ -318,11 +328,16 @@ function safeClick() {//while loop, random i and j, check if cell bomb or opened
             var selectorStr = `[data-i="${i}"][data-j="${j}"]`
             var elCell = document.querySelector(selectorStr)
             elCell.innerHTML = gBoard[i][j].minesAroundCount
-            setTimeout(() => { elCell.innerHTML = UNCLICKED }, 2000)
+            //TODO if the player clciks it, cancel the timeout, and just mark as opened
+            setTimeout(() => {hideAgain(elCell, i, j)}, 2000)
             return
         }
     }
-
+}
+function hideAgain(elCell, i, j){
+    if (gBoard[i][j].isShown===false){
+        elCell.innerHTML = UNCLICKED
+    }
 }
 function newGame() {
     //restarting gGame
