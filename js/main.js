@@ -1,6 +1,6 @@
 
 
-const FLAG = '🚩'//
+const FLAG = '🚩'
 const BOMB = '💣'
 const UNCLICKED = '?'
 const HAPPY = '😄'
@@ -20,14 +20,19 @@ var gGame = {
     marketCount: 0,
     secPassed: 0,
     lives: 3,
-    correct: 0
+    correct: 0,
+    done: false,
+    hints: 3,
+    safeClicks: 3
 }
+var gHint = false
+var gUndo = []//need save the board, the gGame, the lives and flags
 
 function onInit() {
     gBoard = buildBoard()
     showLives()
+    showFlags()
     renderBoard(gBoard, '.board')
-    console.log(gBoard)
 }
 
 function buildBoard() {//first we check i made a board
@@ -44,7 +49,6 @@ function buildBoard() {//first we check i made a board
             }
         }
     }
-
     return board
 }
 
@@ -58,7 +62,7 @@ function renderBoard(mat, selector) {// the selector is where do i place this ma
             var cell = UNCLICKED
             // var className = `cell cell-${i}-${j}`
             var strDataAttrib = `data-i="${i}" data-j="${j}"`
-            strHTML += `<td ${strDataAttrib} onmousedown="nameItSomehow(event, this)">${cell}</td>`// isng just data for i and j
+            strHTML += `<td ${strDataAttrib} onmousedown="clicked(event, this)">${cell}</td>`// isng just data for i and j
         }
         strHTML += '</tr>'
     }
@@ -81,10 +85,17 @@ function setMinesNegsCount(mat, rowIdx, colIdx) {
     }
     return count
 }
-function nameItSomehow(ev, elCell) {
-    // console.log(ev.which);
+function clicked(ev, elCell) {//change the name of the function
     // right click is which = 3
     // left click is which = 1
+    if (gGame.done === true) {
+        return
+    }
+    if (gHint === true) {
+        gGame.hints--
+        showAround(elCell)
+        return
+    }
     switch (ev.which) {
         case 3:
             OnCellMarked(elCell)
@@ -92,19 +103,60 @@ function nameItSomehow(ev, elCell) {
         case 1:
             onCellClicked(elCell)
             break
-
         default:
             break
     }
 }
-function showLives() {
-    var elDiv = document.querySelector('div.lives_left h2 span')
-    elDiv.innerHTML = `${gGame.lives} lives left`
+function showAround(elCell) {//show cells after clicking hint
+    showHints()
+    gHint = false
+    var iIdx = +elCell.dataset.i
+    var jIdx = +elCell.dataset.j
+    for (var i = iIdx - 1; i <= iIdx + 1; i++) {
+        if (i < 0 || i >= gLevel.SIZE) continue//left/right side not out of bounds
+        for (var j = jIdx - 1; j <= jIdx + 1; j++) {
+            if (j < 0 || j >= gLevel.SIZE) continue//top/bot side not out of bounds
+            if (gBoard[i][j].isShown === true) continue
+            var selectorStr = `[data-i="${i}"][data-j="${j}"]`
+            var elPos = document.querySelector(selectorStr)
+            if (gBoard[i][j].isMine === true) {
+                elPos.innerHTML = BOMB
+            }
+            else {
+                elPos.innerHTML = gBoard[i][j].minesAroundCount
+            }
+        }
+    }
+    setTimeout(() => { closeAround(elCell) }, 1000)
+}
+function closeAround(elCell) {//closes cells after the hint
+    var iIdx = +elCell.dataset.i
+    var jIdx = +elCell.dataset.j
+    for (var i = iIdx - 1; i <= iIdx + 1; i++) {
+        if (i < 0 || i >= gLevel.SIZE) continue//left/right side not out of bounds
+        for (var j = jIdx - 1; j <= jIdx + 1; j++) {
+            if (j < 0 || j >= gLevel.SIZE) continue//top/bot side not out of bounds
+            if (gBoard[i][j].isShown === true) continue
+            var selectorStr = `[data-i="${i}"][data-j="${j}"]`
+            var elPos = document.querySelector(selectorStr)
+            elPos.innerHTML = UNCLICKED
+        }
+    }
+}
+function showLives() {//TODO
+    var elSpan = document.querySelector('div h2 span.lives_left')
+    elSpan.innerHTML = `${gGame.lives} lives left`
+}
+function showFlags() {
+    var elSpan = document.querySelector('div h2 span.flags_left')
+    elSpan.innerHTML = `flags left: ${gLevel.Flags}`
+}
+function showHints() {
+    var elSpan = document.querySelector('button.hints')
+    elSpan.innerText = `hints: ${gGame.hints}`
 }
 //used to be function onCellClicked(elCell, iIdx, jIdx)
 function onCellClicked(elCell) {
-    // console.log(elCell);
-    // console.log(i, j);
     var iIdx = +elCell.dataset.i
     var jIdx = +elCell.dataset.j
     if (gGame.isOn === false) {
@@ -115,7 +167,6 @@ function onCellClicked(elCell) {
             var cell = gBoard[iBomb][jBomb]
             if (!cell.isMine && /*cell.isShown === false &&*/ cell !== gBoard[iIdx][jIdx]) {
                 cell.isMine = true
-                // console.log(iBomb, jBomb)
                 i++
             }
         }
@@ -124,18 +175,15 @@ function onCellClicked(elCell) {
                 if (!gBoard[i][j].isMine) {
                     var bombsCount = setMinesNegsCount(gBoard, i, j)
                     gBoard[i][j].minesAroundCount = bombsCount
-                    // console.log(bombsCount);
                 }
             }
             gGame.isOn = true
         }
         gBoard[iIdx][jIdx].isShown = true
         elCell.innerHTML = gBoard[iIdx][jIdx].minesAroundCount
-        // console.log(gBoard[iIdx][jIdx]);
+        elCell.classList.add('opened')
         gGame.correct++
-        if (gBoard[iIdx][jIdx].minesAroundCount===0) openAroundCells(iIdx, jIdx)
-        console.log('first click');
-        console.log("count", gGame.correct);
+        if (gBoard[iIdx][jIdx].minesAroundCount === 0) openAroundCells(iIdx, jIdx)
         return
     }
     if (gBoard[iIdx][jIdx].isShown || gBoard[iIdx][jIdx].isMarked) {
@@ -146,26 +194,43 @@ function onCellClicked(elCell) {
         gGame.correct++
         var emoji = document.querySelector('div.alive_or_dead h2')
         emoji.innerHTML = HAPPY
-        if (gBoard[iIdx][jIdx].minesAroundCount===0) {
+        gBoard[iIdx][jIdx].isShown = true
+        elCell.classList.add('opened')
+        if (gBoard[iIdx][jIdx].minesAroundCount === 0) {
             openAroundCells(iIdx, jIdx)
-            console.log('opened few');
-           
         }
     }
     else {
         elCell.innerHTML = `${BOMB}`
         gGame.lives--
+        gLevel.Flags--//TODO update flag counter
+        gBoard[iIdx][jIdx].isShown = true
         showLives()
+        showFlags()
         var emoji = document.querySelector('div.alive_or_dead h2')
         emoji.innerHTML = SAD
         //check if game over
     }
-    console.log("count", gGame.correct);
-    gBoard[iIdx][jIdx].isShown = true
     checkGameOver()
-
 }
-function openAroundCells(iIdx, jIdx) {//trolling me, adding count for nothing :(
+// function openAroundCells(iIdx, jIdx) {//the original open around, for the 3x3
+//     iIdx = +iIdx
+//     jIdx = +jIdx
+//     for (var i = iIdx - 1; i <= iIdx + 1; i++) {
+//         if (i < 0 || i >= gLevel.SIZE) continue//left/right side not out of bounds
+//         for (var j = jIdx - 1; j <= jIdx + 1; j++) {
+//             if (i === iIdx && j === jIdx) continue//doesnt check himself
+//             if (j < 0 || j >= gLevel.SIZE) continue//top/bot side not out of bounds
+//             if (gBoard[i][j].isMine === true || gBoard[i][j].isShown === true) continue
+//             var selectorStr = `[data-i="${i}"][data-j="${j}"]`
+//             var elCell = document.querySelector(selectorStr)
+//             elCell.innerHTML = gBoard[i][j].minesAroundCount
+//             gGame.correct++
+//             gBoard[i][j].isShown = true
+//         }
+//     }
+// }
+function openAroundCells(iIdx, jIdx) {//the original open around, for the 3x3
     iIdx = +iIdx
     jIdx = +jIdx
     for (var i = iIdx - 1; i <= iIdx + 1; i++) {
@@ -173,27 +238,39 @@ function openAroundCells(iIdx, jIdx) {//trolling me, adding count for nothing :(
         for (var j = jIdx - 1; j <= jIdx + 1; j++) {
             if (i === iIdx && j === jIdx) continue//doesnt check himself
             if (j < 0 || j >= gLevel.SIZE) continue//top/bot side not out of bounds
-            if (gBoard[i][j].isMine===true||gBoard[i][j].isShown===true) continue
+            // if (gBoard[i][j].isMine === true || gBoard[i][j].isShown === true) continue
+            if (gBoard[i][j].isMine === true) continue
+            if (gBoard[i][j].isShown === true) continue
             var selectorStr = `[data-i="${i}"][data-j="${j}"]`
             var elCell = document.querySelector(selectorStr)
             elCell.innerHTML = gBoard[i][j].minesAroundCount
-            gGame.correct++
             gBoard[i][j].isShown = true
+            elCell.classList.add('opened')
+            // debugger
+            gGame.correct++
+            if (gBoard[i][j].minesAroundCount===0) {
+                openAroundCells(i,j)
+            }
         }
     }
+    return
+    //i will need to find the problem, cause i have no idea why, like
+    //i do, first cell counted too, but thats pain
 }
+
 
 function OnCellMarked(elCell) {
     var jIdx = elCell.dataset.j
     var iIdx = elCell.dataset.i
     var cellPos = gBoard[iIdx][jIdx]
-    if (cellPos.isShown===true) {//if its opened
+    if (cellPos.isShown === true) {//if its opened
         return
     }
     if (cellPos.isMarked) {//if already flaged
         cellPos.isMarked = false
         gLevel.Flags++
         elCell.innerHTML = UNCLICKED
+        showFlags()
         return
     }
     if (gLevel.Flags === 0) {//left flags
@@ -202,13 +279,16 @@ function OnCellMarked(elCell) {
     gLevel.Flags--
     cellPos.isMarked = true
     elCell.innerHTML = `${FLAG}`
+    showFlags()
     checkGameOver()
 }
 function checkGameOver() {
-    if (gGame.correct === gLevel.SafeCells) {//found all correct cells
+    if (gGame.correct === gLevel.SafeCells&&gLevel.Flags===0) {//found all correct cells
+        gGame.done = true
         win()
     }
     if (gGame.lives === 0) {//no lives left
+        gGame.done = true
         lose()
     }
 }
@@ -223,6 +303,27 @@ function lose() {
     console.log('lose')
     alert('lose')
 }
+function hint() {
+    if (gGame.hints>0) {
+        gHint = true
+    }
+}
+function safeClick() {//while loop, random i and j, check if cell bomb or opened, timer of 1 sec to show
+    if (gGame.isOn === false) return
+    while (true) {
+        var i = getRandomInt(0, gLevel.SIZE - 1)
+        var j = getRandomInt(0, gLevel.SIZE - 1)
+        var cell = gBoard[i][j]
+        if (cell.isMine === false && cell.isShown === false && cell.isMarked === false) {
+            var selectorStr = `[data-i="${i}"][data-j="${j}"]`
+            var elCell = document.querySelector(selectorStr)
+            elCell.innerHTML = gBoard[i][j].minesAroundCount
+            setTimeout(() => { elCell.innerHTML = UNCLICKED }, 2000)
+            return
+        }
+    }
+
+}
 function newGame() {
     //restarting gGame
     gGame.isOn = false
@@ -231,7 +332,13 @@ function newGame() {
     gGame.secPassed = 0
     gGame.lives = 3
     gGame.correct = 0
+    gGame.done = false
     gBoard = []
+    gGame.hints = 3
+    gGame.safeClicks = 3
+
+    gHint = false
+    gLevel.Flags = gLevel.Mines
 
     var emoji = document.querySelector('div.alive_or_dead h2')
     emoji.innerHTML = HAPPY
@@ -243,42 +350,28 @@ function changeDiff(num) {
         case 1:
             //easy diff 4*4 ,2 mines
             gLevel.SIZE = 4,
-            gLevel.Mines = 2,
-            gLevel.Flags = 2,
-            gLevel.SafeCells = 14
+                gLevel.Mines = 2,//2
+                gLevel.Flags = 2,
+                gLevel.SafeCells = 14
             newGame()
             break
         case 2:
             //medium diff 8*8, 14 mines
             gLevel.SIZE = 8,
-            gLevel.Mines = 14,
-            gLevel.Flags = 14,
-            gLevel.SafeCells = 8*8-14
+                gLevel.Mines = 14,
+                gLevel.Flags = 14,
+                gLevel.SafeCells = 8 * 8 - 14
             newGame()
             break
         case 3:
             //hard diff 12*12, 32 mines
             gLevel.SIZE = 12,
-            gLevel.Mines = 32,
-            gLevel.Flags = 32,
-            gLevel.SafeCells = 12*12-32
+                gLevel.Mines = 32,
+                gLevel.Flags = 32,
+                gLevel.SafeCells = 12 * 12 - 32
             newGame()
             break
         default:
             break
     }
 }
-
-
-function expandShown(board, elCell, i, j) {
-    //TODO first step is just around the clicked cell
-
-    //bonus, open all the cells with 0 mines around
-}
-
-
-//have clear mat, and first click saves i and j and general all other
-//without regenerating this 1
-
-//have already made martix with everythihg, and only after first click
-//generate bombs

@@ -15,9 +15,15 @@
     <h1>my mine sweeper</h1>
     <button onclick="changeDiff(1)">easy</button><br>
     <button onclick="changeDiff(2)">medium</button><br>
-    <button onclick="changeDiff(3)">hard</button>
+    <button onclick="changeDiff(3)">hard</button><br>
+    <button class="hints" onclick="hint()">hints: 3</button>
+
+    <!-- add bulbs for decoration -->
+    <!-- to understand what local storage is and for what i need it -->
+
+    <button onclick="safeClick()">safe click i guess</button>
     <div class="alive_or_dead"><h2 onclick="newGame()">😄</h2></div>
-    <div class="lives_left"><h2><span></span></h2></div>
+    <div ><h2 ><span class="flags_left">flags left:</span>&emsp;<span class="lives_left"></span></h2></div>
     <table>
         <tbody class="board"></tbody>
     </table>

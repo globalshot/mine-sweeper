@@ -22,7 +22,7 @@ div.alive_or_dead h2{
     margin: 50px auto 10px;
     text-align: center;
 }
-div.lives_left h2{
+/* div.lives_left h2{
     margin: 10px auto 20px;
     text-align: center;
 }
@@ -30,4 +30,29 @@ div.lives_left h2 span{
     font-size: 30px;
     color: red;
     background-color: rgb(83, 59, 138);
+} */
+/* div h2.lives_left{
+    margin: 10px auto 20px;
+    text-align: center;
+} */
+/* div h2.lives_left span{
+    font-size: 30px;
+    color: red;
+    background-color: rgb(83, 59, 138);
+} */
+div h2 span.lives_left{
+    font-size: 30px;
+    color: red;
+    background-color: rgb(83, 59, 138);
+}
+/* div h2.flags_left{
+    margin: 10px auto 20px;
+    text-align: center;
+} */
+div h2{
+    margin: 10px auto 20px;
+    text-align: center;
+}
+.opened{
+    background-color: green;
 }
