@@ -13,28 +13,40 @@
 
 <body onload="onInit()">
     <h1>my mine sweeper</h1>
-    <button onclick="changeDiff(1)">easy</button><br>
-    <button onclick="changeDiff(2)">medium</button><br>
-    <button onclick="changeDiff(3)">hard</button><br>
-    <button onclick="manualPlace()">manual place mode</button>
-    <button class="hints" onclick="hint()">hints: 3</button><br>
+    <div class="difficulties">
+        <p class="p_difficulties">difficulties:</p>
+        <button class="easy" onclick="changeDiff(1)">easy</button><br>
+        <button class="medium" onclick="changeDiff(2)">medium</button><br>
+        <button class="hard" onclick="changeDiff(3)">hard</button>
+    </div>
 
+    <div class="manual_div"><button class="manual" onclick="manualPlace(this)">manual place mode</button></div>
+    <div class="helping_tools">
+        <p style="color: black; size: 5px;">helping tools</p>
+        <button class="hints" onclick="hint(this)">hints: 3</button><br>
+        <button class="safe" onclick="safeClick()">safe click: 3</button>
+    </div>
     <!-- undo doesnt work yet -->
     <!-- <button onclick="UNDO()">UNDO</button> -->
 
     <!-- add bulbs for decoration of hints -->
     <!-- to understand what local storage is and for what i need it -->
 
-    <button class="safe" onclick="safeClick()">safe click: 3</button>
-    <div class="alive_or_dead"><h2 onclick="newGame()">😄</h2></div>
-    <div class="timer"><h2>0 seconds</h2></div>
-    <div ><h2 ><span class="flags_left">flags left:</span>&emsp;<span class="lives_left"></span></h2></div>
+    <div class="alive_or_dead">
+        <h2 onclick="newGame()">😄</h2>
+    </div>
+    <div class="timer">
+        <h2>0 seconds</h2>
+    </div>
+    <div>
+        <h2><span class="flags_left">flags left:</span>&emsp;<span class="lives_left"></span></h2>
+    </div>
     <table>
         <tbody class="board"></tbody>
     </table>
     <br>
     <footer>
-        <p>Steven Buchinsky</p> 
+        <p>Steven Buchinsky</p>
     </footer>
     <script src="js/main.js"></script>
     <script src="js/utils.js"></script>

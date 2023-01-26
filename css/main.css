@@ -1,10 +1,11 @@
-body{
+body {
     background-color: grey;
 }
-table{
+table {
     margin: 20px auto;
 }
-tr, td{
+tr,
+td {
     text-align: center;
     background-color: white;
     border-radius: 5px;
@@ -12,52 +13,85 @@ tr, td{
     height: 30px;
     width: 30px;
 }
-footer{
+
+
+footer {
     position: fixed;
     margin-top: auto;
     bottom: 0;
     left: 20px;
     font-size: 20px;
 }
-div.alive_or_dead h2{
-    margin: 50px auto 10px;
+
+
+div.alive_or_dead h2 {
+    margin: auto auto 10px;
     text-align: center;
 }
-/* div.lives_left h2{
-    margin: 10px auto 20px;
-    text-align: center;
-}
-div.lives_left h2 span{
-    font-size: 30px;
-    color: red;
-    background-color: rgb(83, 59, 138);
-} */
-/* div h2.lives_left{
-    margin: 10px auto 20px;
-    text-align: center;
-} */
-/* div h2.lives_left span{
-    font-size: 30px;
-    color: red;
-    background-color: rgb(83, 59, 138);
-} */
-div h2 span.lives_left{
+div h2 span.lives_left {
     font-size: 30px;
     color: red;
     background-color: rgb(83, 59, 138);
 }
-/* div h2.flags_left{
-    margin: 10px auto 20px;
-    text-align: center;
-} */
-div h2{
+div h2 {
     margin: 10px auto 20px;
     text-align: center;
 }
-.opened{
+.opened {
     background-color: green;
 }
-div.timer h2{
+div.timer h2 {
     margin: 0px auto 10px;
     text-align: center;
+}
+
+div.difficulties{
+    margin-top: 0px;
+    background-color: #5100ff;
+    display: inline-flex;
+}
+p.p_difficulties{
+    font-size: 20px;
+    margin-bottom: 5px;
+    margin-top: 2px;
+    color: greenyellow;
+}
+.manual{
+    margin-top: 5px;
+}
+.using{
+    background-color: yellow;
+}
+
+button{
+    margin-bottom: 2px;
+    border-radius: 10px;
+    height: 30px;
+}
+.easy {
+    background: lightblue;
+    color: white;
+}
+.medium {
+    background: cyan;
+}
+.hard {
+    background-color: purple;
+    color: yellow;
+}
+div.manual_div{
+    display: table;
+    background-color: teal;
+    margin-top: 5px;
+    margin-bottom: 2px;
+}
+div p{
+    font-size: 25px;
+    color: black;
+    size: 10px;
+    margin-bottom: 4px
+}
+div.helping_tools{
+    margin-top: 20px;
+    display: table;
 }

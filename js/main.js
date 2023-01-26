@@ -25,11 +25,12 @@ var gGame = {
     hints: 3,
     safeClicks: 3
 }
-var gHint = false
-var gManual ={
+var gManual = {
     placing: false,//like 97, 29, 234
     bombs: 0
 }
+
+var gHint = false
 var gUndo = []//need save the board, the gGame, the lives and flags
 var gTimer
 var gTime = 0
@@ -59,7 +60,6 @@ function buildBoard() {//first we check i made a board
     }
     return board
 }
-
 function renderBoard(mat, selector) {// the selector is where do i place this matrix
     //render the board as table
     var strHTML = ''
@@ -77,6 +77,7 @@ function renderBoard(mat, selector) {// the selector is where do i place this ma
     const elBoard = document.querySelector(selector)
     elBoard.innerHTML = strHTML
 }
+
 
 function setMinesNegsCount(mat, rowIdx, colIdx) {
     //counts mines around each cell and sets the cell minesAroundCount
@@ -103,7 +104,9 @@ function clicked(ev, elCell) {//change the name of the function
         clickBombPlace(elCell)
         return
     }
-    if (gHint === true&&gGame.isOn===true) {
+    if (gHint === true && gGame.isOn === true) {
+        var elBtn = document.querySelector(".hints")
+        elBtn.classList.remove("using")
         gGame.hints--
         showAround(elCell)
         return
@@ -123,18 +126,75 @@ function clickBombPlace(elCell) {
     var iIdx = +elCell.dataset.i
     var jIdx = +elCell.dataset.j
     var cell = gBoard[iIdx][jIdx]
-    if (cell.isMine===true) {
+    if (cell.isMine === true) {
         return
     }
     cell.isMine = true
     gManual.bombs++
-    if (gManual.bombs===gLevel.Mines) {
-        gManual.placing=false
+    if (gManual.bombs === gLevel.Mines) {
+        gManual.placing = false
+        var elBtn = document.querySelector(".manual")
+        elBtn.classList.remove("using")
         alert('you have placed all the bombs')
         setCellNumber()
-        gManual.bombs=0
-        gGame.isOn=true
+        gManual.bombs = 0
+        gGame.isOn = true
     }
+}
+
+
+function onCellClicked(elCell) {
+    var iIdx = +elCell.dataset.i
+    var jIdx = +elCell.dataset.j
+    if (gGame.isOn === false) {
+
+        for (var i = 0; i < gLevel.Mines; i) {//generate bombs at random places
+            var iBomb = getRandomInt(0, gLevel.SIZE - 1)
+            var jBomb = getRandomInt(0, gLevel.SIZE - 1)
+            var cell = gBoard[iBomb][jBomb]
+            if (!cell.isMine && /*cell.isShown === false &&*/ cell !== gBoard[iIdx][jIdx]) {
+                cell.isMine = true
+                i++
+            }
+        }
+        setCellNumber()
+        gGame.isOn = true
+        gBoard[iIdx][jIdx].isShown = true
+        elCell.innerHTML = gBoard[iIdx][jIdx].minesAroundCount
+        elCell.classList.add('opened')
+        gGame.correct++
+        if (gBoard[iIdx][jIdx].minesAroundCount === 0) openAroundCells(iIdx, jIdx)
+        gTimer = setInterval(() => { setTime() }, 1000)
+        //gUndo.push(addToUndo())
+        return
+    }
+    if (gBoard[iIdx][jIdx].isShown || gBoard[iIdx][jIdx].isMarked) {
+        return
+    }
+    if (gBoard[iIdx][jIdx].isMine === false) {
+        elCell.innerHTML = gBoard[iIdx][jIdx].minesAroundCount
+        gGame.correct++
+        var emoji = document.querySelector('div.alive_or_dead h2')
+        emoji.innerHTML = HAPPY
+        gBoard[iIdx][jIdx].isShown = true
+        elCell.classList.add('opened')
+        if (gBoard[iIdx][jIdx].minesAroundCount === 0) {
+            openAroundCells(iIdx, jIdx)
+        }
+    }
+    else {
+        elCell.innerHTML = `${BOMB}`
+        gGame.lives--
+        gLevel.Flags--
+        gBoard[iIdx][jIdx].isShown = true
+        showLives()
+        showFlags()
+        var emoji = document.querySelector('div.alive_or_dead h2')
+        emoji.innerHTML = SAD
+        //check if game over
+    }
+    //gUndo.push(addToUndo())
+    checkGameOver()
 }
 function showAround(elCell) {//show cells after clicking hint
     showHints()
@@ -172,96 +232,6 @@ function closeAround(elCell) {//closes cells after the hint
         }
     }
 }
-function showLives() {
-    var elSpan = document.querySelector('div h2 span.lives_left')
-    elSpan.innerHTML = `${gGame.lives} lives left`
-}
-function showFlags() {
-    var elSpan = document.querySelector('div h2 span.flags_left')
-    elSpan.innerHTML = `flags left: ${gLevel.Flags}`
-}
-function showHints() {
-    var elBtn = document.querySelector('button.hints')
-    elBtn.innerText = `hints: ${gGame.hints}`
-}
-function showSafe() {
-    var elBtn = document.querySelector('button.safe')
-    elBtn.innerText = `safe clicks: ${gGame.safeClicks}`
-}
-//used to be function onCellClicked(elCell, iIdx, jIdx)
-function onCellClicked(elCell) {
-    var iIdx = +elCell.dataset.i
-    var jIdx = +elCell.dataset.j
-    if (gGame.isOn === false) {
-
-        for (var i = 0; i < gLevel.Mines; i) {//generate bombs at random places
-            var iBomb = getRandomInt(0, gLevel.SIZE - 1)
-            var jBomb = getRandomInt(0, gLevel.SIZE - 1)
-            var cell = gBoard[iBomb][jBomb]
-            if (!cell.isMine && /*cell.isShown === false &&*/ cell !== gBoard[iIdx][jIdx]) {
-                cell.isMine = true
-                i++
-            }
-        }
-        setCellNumber()
-        gGame.isOn = true
-        gBoard[iIdx][jIdx].isShown = true
-        elCell.innerHTML = gBoard[iIdx][jIdx].minesAroundCount
-        elCell.classList.add('opened')
-        gGame.correct++
-        if (gBoard[iIdx][jIdx].minesAroundCount === 0) openAroundCells(iIdx, jIdx)
-        gTimer = setInterval(()=>{setTime()}, 1000)
-        //gUndo.push(addToUndo())
-        return
-    }
-    if (gBoard[iIdx][jIdx].isShown || gBoard[iIdx][jIdx].isMarked) {
-        return
-    }
-    if (gBoard[iIdx][jIdx].isMine === false) {
-        elCell.innerHTML = gBoard[iIdx][jIdx].minesAroundCount
-        gGame.correct++
-        var emoji = document.querySelector('div.alive_or_dead h2')
-        emoji.innerHTML = HAPPY
-        gBoard[iIdx][jIdx].isShown = true
-        elCell.classList.add('opened')
-        if (gBoard[iIdx][jIdx].minesAroundCount === 0) {
-            openAroundCells(iIdx, jIdx)
-        }
-    }
-    else {
-        elCell.innerHTML = `${BOMB}`
-        gGame.lives--
-        gLevel.Flags--
-        gBoard[iIdx][jIdx].isShown = true
-        showLives()
-        showFlags()
-        var emoji = document.querySelector('div.alive_or_dead h2')
-        emoji.innerHTML = SAD
-        //check if game over
-    }
-    //gUndo.push(addToUndo())
-    checkGameOver()
-}
-function setTime() {
-    if (gGame.isOn===true) gTime++
-    var elH2 = document.querySelector('div.timer h2')
-    elH2.innerHTML = `${gTime} seconds`
-
-}
-function setCellNumber() {
-    for (var i = 0; i < gLevel.SIZE; i++) {//sets cell number
-        for (var j = 0; j < gLevel.SIZE; j++) {
-            if (!gBoard[i][j].isMine) {
-                var bombsCount = setMinesNegsCount(gBoard, i, j)
-                gBoard[i][j].minesAroundCount = bombsCount
-            }
-        }
-    }
-}
-function manualPlace() {
-    newGame()
-    gManual.placing = true
-}
 function openAroundCells(iIdx, jIdx) {//the original open around, for the 3x3
     iIdx = +iIdx
     jIdx = +jIdx
@@ -281,8 +251,8 @@ function openAroundCells(iIdx, jIdx) {//the original open around, for the 3x3
             elCell.classList.add('opened')
             // debugger
             gGame.correct++
-            if (gBoard[i][j].minesAroundCount===0) {
-                openAroundCells(i,j)
+            if (gBoard[i][j].minesAroundCount === 0) {
+                openAroundCells(i, j)
             }
         }
     }
@@ -290,7 +260,54 @@ function openAroundCells(iIdx, jIdx) {//the original open around, for the 3x3
     //i will need to find the problem, cause i have no idea why, like
     //i do, first cell counted too, but thats pain
 }
+function setCellNumber() {
+    for (var i = 0; i < gLevel.SIZE; i++) {//sets cell number
+        for (var j = 0; j < gLevel.SIZE; j++) {
+            if (!gBoard[i][j].isMine) {
+                var bombsCount = setMinesNegsCount(gBoard, i, j)
+                gBoard[i][j].minesAroundCount = bombsCount
+            }
+        }
+    }
+}
 
+
+function showLives() {
+    var elSpan = document.querySelector('div h2 span.lives_left')
+    elSpan.innerHTML = `${gGame.lives} lives left`
+}
+function showFlags() {
+    var elSpan = document.querySelector('div h2 span.flags_left')
+    elSpan.innerHTML = `flags left: ${gLevel.Flags}`
+}
+function showHints() {
+    var elBtn = document.querySelector('button.hints')
+    elBtn.innerText = `hints: ${gGame.hints}`
+}
+function showSafe() {
+    var elBtn = document.querySelector('button.safe')
+    elBtn.innerText = `safe clicks: ${gGame.safeClicks}`
+}
+function setTime() {
+    if (gGame.isOn === true) gTime++
+    var elH2 = document.querySelector('div.timer h2')
+    elH2.innerHTML = `${gTime} seconds`
+
+}
+
+
+function manualPlace(elBtn) {
+    if (gManual.placing === true) {
+        elBtn.classList.remove("using")
+        gManual.placing = false
+    }
+    else {
+        elBtn.classList.add("using")
+        gManual.placing = true
+    }
+    newGame()
+
+}
 function OnCellMarked(elCell) {
     var jIdx = elCell.dataset.j
     var iIdx = elCell.dataset.i
@@ -315,7 +332,7 @@ function OnCellMarked(elCell) {
     checkGameOver()
 }
 function checkGameOver() {
-    if (gGame.correct === gLevel.SafeCells&&gLevel.Flags===0) {//found all correct cells
+    if (gGame.correct === gLevel.SafeCells && gLevel.Flags === 0) {//found all correct cells
         gGame.done = true
         win()
     }
@@ -324,6 +341,9 @@ function checkGameOver() {
         lose()
     }
 }
+
+
+
 function win() {//TODO you still need stop the time interval
     //have to make it
     var emoji = document.querySelector('div.alive_or_dead h2')
@@ -336,14 +356,17 @@ function lose() {
     clearInterval(gTimer)
     alert('lose')
 }
-function hint() {
-    if (gGame.hints>0) {
+
+
+function hint(elBtn) {
+    if (gGame.hints > 0&&gGame.isOn) {
+        elBtn.classList.add("using")
         gHint = true
     }
 }
 function safeClick() {//while loop, random i and j, check if cell bomb or opened, timer of 1 sec to show
     if (gGame.isOn === false) return
-    if (gGame.safeClicks<=0) {
+    if (gGame.safeClicks <= 0) {
         return
     }
     if (gGame.correct === gLevel.SafeCells) {
@@ -361,13 +384,13 @@ function safeClick() {//while loop, random i and j, check if cell bomb or opened
             var elCell = document.querySelector(selectorStr)
             elCell.innerHTML = gBoard[i][j].minesAroundCount
             //TODO if the player clciks it, cancel the timeout, and just mark as opened
-            setTimeout(() => {hideAgain(elCell, i, j)}, 2000)
+            setTimeout(() => { hideAgain(elCell, i, j) }, 2000)
             return
         }
     }
 }
-function hideAgain(elCell, i, j){
-    if (gBoard[i][j].isShown===false){
+function hideAgain(elCell, i, j) {
+    if (gBoard[i][j].isShown === false) {
         elCell.innerHTML = UNCLICKED
     }
 }
@@ -384,41 +407,41 @@ function newGame() {
     gGame.hints = 3
     gGame.safeClicks = 3
 
+    gManual.bombs=0
     gHint = false
     gLevel.Flags = gLevel.Mines
     clearInterval(gTimer)
-    gTimer=0
-    gTime=0
+    gTimer = 0
+    gTime = 0
     setTime()
     var emoji = document.querySelector('div.alive_or_dead h2')
     emoji.innerHTML = HAPPY
     onInit()
 }
-
 function changeDiff(num) {
     switch (num) {
         case 1:
             //easy diff 4*4 ,2 mines
             gLevel.SIZE = 4,
-                gLevel.Mines = 2,//2
-                gLevel.Flags = 2,
-                gLevel.SafeCells = 14
+            gLevel.Mines = 2,//2
+            gLevel.Flags = 2,
+            gLevel.SafeCells = 14
             newGame()
             break
         case 2:
             //medium diff 8*8, 14 mines
             gLevel.SIZE = 8,
-                gLevel.Mines = 14,
-                gLevel.Flags = 14,
-                gLevel.SafeCells = 8 * 8 - 14
+            gLevel.Mines = 14,
+            gLevel.Flags = 14,
+            gLevel.SafeCells = 8 * 8 - 14
             newGame()
             break
         case 3:
             //hard diff 12*12, 32 mines
             gLevel.SIZE = 12,
-                gLevel.Mines = 32,
-                gLevel.Flags = 32,
-                gLevel.SafeCells = 12 * 12 - 32
+            gLevel.Mines = 32,
+            gLevel.Flags = 32,
+            gLevel.SafeCells = 12 * 12 - 32
             newGame()
             break
         default:
@@ -433,7 +456,7 @@ function changeDiff(num) {
 //cant finish UNDO
 //
 function UNDO() {
-    if (gUndo.length===0){
+    if (gUndo.length === 0) {
         alert('there no step back')
         return
     }
