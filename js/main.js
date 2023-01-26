@@ -144,7 +144,7 @@ function closeAround(elCell) {//closes cells after the hint
         }
     }
 }
-function showLives() {//TODO
+function showLives() {
     var elSpan = document.querySelector('div h2 span.lives_left')
     elSpan.innerHTML = `${gGame.lives} lives left`
 }
@@ -208,7 +208,7 @@ function onCellClicked(elCell) {
     else {
         elCell.innerHTML = `${BOMB}`
         gGame.lives--
-        gLevel.Flags--//TODO update flag counter
+        gLevel.Flags--
         gBoard[iIdx][jIdx].isShown = true
         showLives()
         showFlags()
@@ -316,6 +316,10 @@ function hint() {
 function safeClick() {//while loop, random i and j, check if cell bomb or opened, timer of 1 sec to show
     if (gGame.isOn === false) return
     if (gGame.safeClicks<=0) {
+        return
+    }
+    if (gGame.correct === gLevel.SafeCells) {
+        alert('cant show, because only bombs left')
         return
     }
     gGame.safeClicks--
