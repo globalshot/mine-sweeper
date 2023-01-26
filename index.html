@@ -16,13 +16,18 @@
     <button onclick="changeDiff(1)">easy</button><br>
     <button onclick="changeDiff(2)">medium</button><br>
     <button onclick="changeDiff(3)">hard</button><br>
-    <button class="hints" onclick="hint()">hints: 3</button>
+    <button onclick="manualPlace()">manual place mode</button>
+    <button class="hints" onclick="hint()">hints: 3</button><br>
 
-    <!-- add bulbs for decoration -->
+    <!-- undo doesnt work yet -->
+    <!-- <button onclick="UNDO()">UNDO</button> -->
+
+    <!-- add bulbs for decoration of hints -->
     <!-- to understand what local storage is and for what i need it -->
 
     <button class="safe" onclick="safeClick()">safe click: 3</button>
     <div class="alive_or_dead"><h2 onclick="newGame()">😄</h2></div>
+    <div class="timer"><h2>0 seconds</h2></div>
     <div ><h2 ><span class="flags_left">flags left:</span>&emsp;<span class="lives_left"></span></h2></div>
     <table>
         <tbody class="board"></tbody>

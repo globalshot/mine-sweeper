@@ -57,3 +57,7 @@ div h2{
 .opened{
     background-color: green;
 }
+div.timer h2{
+    margin: 0px auto 10px;
+    text-align: center;
+}

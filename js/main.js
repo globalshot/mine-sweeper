@@ -26,13 +26,20 @@ var gGame = {
     safeClicks: 3
 }
 var gHint = false
+var gManual ={
+    placing: false,//like 97, 29, 234
+    bombs: 0
+}
 var gUndo = []//need save the board, the gGame, the lives and flags
+var gTimer
+var gTime = 0
 
 function onInit() {
     gBoard = buildBoard()
     showLives()
     showFlags()
     showSafe()
+    showHints()
     renderBoard(gBoard, '.board')
 }
 
@@ -92,7 +99,11 @@ function clicked(ev, elCell) {//change the name of the function
     if (gGame.done === true) {
         return
     }
-    if (gHint === true) {
+    if (gManual.placing === true) {//make true/false about manual placing, so it wont start opening them
+        clickBombPlace(elCell)
+        return
+    }
+    if (gHint === true&&gGame.isOn===true) {
         gGame.hints--
         showAround(elCell)
         return
@@ -106,6 +117,23 @@ function clicked(ev, elCell) {//change the name of the function
             break
         default:
             break
+    }
+}
+function clickBombPlace(elCell) {
+    var iIdx = +elCell.dataset.i
+    var jIdx = +elCell.dataset.j
+    var cell = gBoard[iIdx][jIdx]
+    if (cell.isMine===true) {
+        return
+    }
+    cell.isMine = true
+    gManual.bombs++
+    if (gManual.bombs===gLevel.Mines) {
+        gManual.placing=false
+        alert('you have placed all the bombs')
+        setCellNumber()
+        gManual.bombs=0
+        gGame.isOn=true
     }
 }
 function showAround(elCell) {//show cells after clicking hint
@@ -175,20 +203,15 @@ function onCellClicked(elCell) {
                 i++
             }
         }
-        for (var i = 0; i < gLevel.SIZE; i++) {
-            for (var j = 0; j < gLevel.SIZE; j++) {
-                if (!gBoard[i][j].isMine) {
-                    var bombsCount = setMinesNegsCount(gBoard, i, j)
-                    gBoard[i][j].minesAroundCount = bombsCount
-                }
-            }
-            gGame.isOn = true
-        }
+        setCellNumber()
+        gGame.isOn = true
         gBoard[iIdx][jIdx].isShown = true
         elCell.innerHTML = gBoard[iIdx][jIdx].minesAroundCount
         elCell.classList.add('opened')
         gGame.correct++
         if (gBoard[iIdx][jIdx].minesAroundCount === 0) openAroundCells(iIdx, jIdx)
+        gTimer = setInterval(()=>{setTime()}, 1000)
+        //gUndo.push(addToUndo())
         return
     }
     if (gBoard[iIdx][jIdx].isShown || gBoard[iIdx][jIdx].isMarked) {
@@ -216,25 +239,29 @@ function onCellClicked(elCell) {
         emoji.innerHTML = SAD
         //check if game over
     }
+    //gUndo.push(addToUndo())
     checkGameOver()
 }
-// function openAroundCells(iIdx, jIdx) {//the original open around, for the 3x3
-//     iIdx = +iIdx
-//     jIdx = +jIdx
-//     for (var i = iIdx - 1; i <= iIdx + 1; i++) {
-//         if (i < 0 || i >= gLevel.SIZE) continue//left/right side not out of bounds
-//         for (var j = jIdx - 1; j <= jIdx + 1; j++) {
-//             if (i === iIdx && j === jIdx) continue//doesnt check himself
-//             if (j < 0 || j >= gLevel.SIZE) continue//top/bot side not out of bounds
-//             if (gBoard[i][j].isMine === true || gBoard[i][j].isShown === true) continue
-//             var selectorStr = `[data-i="${i}"][data-j="${j}"]`
-//             var elCell = document.querySelector(selectorStr)
-//             elCell.innerHTML = gBoard[i][j].minesAroundCount
-//             gGame.correct++
-//             gBoard[i][j].isShown = true
-//         }
-//     }
-// }
+function setTime() {
+    if (gGame.isOn===true) gTime++
+    var elH2 = document.querySelector('div.timer h2')
+    elH2.innerHTML = `${gTime} seconds`
+
+}
+function setCellNumber() {
+    for (var i = 0; i < gLevel.SIZE; i++) {//sets cell number
+        for (var j = 0; j < gLevel.SIZE; j++) {
+            if (!gBoard[i][j].isMine) {
+                var bombsCount = setMinesNegsCount(gBoard, i, j)
+                gBoard[i][j].minesAroundCount = bombsCount
+            }
+        }
+    }
+}
+function manualPlace() {
+    newGame()
+    gManual.placing = true
+}
 function openAroundCells(iIdx, jIdx) {//the original open around, for the 3x3
     iIdx = +iIdx
     jIdx = +jIdx
@@ -246,6 +273,7 @@ function openAroundCells(iIdx, jIdx) {//the original open around, for the 3x3
             // if (gBoard[i][j].isMine === true || gBoard[i][j].isShown === true) continue
             if (gBoard[i][j].isMine === true) continue
             if (gBoard[i][j].isShown === true) continue
+            if (gBoard[i][j].isMarked === true) continue
             var selectorStr = `[data-i="${i}"][data-j="${j}"]`
             var elCell = document.querySelector(selectorStr)
             elCell.innerHTML = gBoard[i][j].minesAroundCount
@@ -262,7 +290,6 @@ function openAroundCells(iIdx, jIdx) {//the original open around, for the 3x3
     //i will need to find the problem, cause i have no idea why, like
     //i do, first cell counted too, but thats pain
 }
-
 
 function OnCellMarked(elCell) {
     var jIdx = elCell.dataset.j
@@ -301,11 +328,12 @@ function win() {//TODO you still need stop the time interval
     //have to make it
     var emoji = document.querySelector('div.alive_or_dead h2')
     emoji.innerHTML = WINNER
+    clearInterval(gTimer)
     alert('win')
 }
 function lose() {
     //gotta make it
-    console.log('lose')
+    clearInterval(gTimer)
     alert('lose')
 }
 function hint() {
@@ -358,7 +386,10 @@ function newGame() {
 
     gHint = false
     gLevel.Flags = gLevel.Mines
-
+    clearInterval(gTimer)
+    gTimer=0
+    gTime=0
+    setTime()
     var emoji = document.querySelector('div.alive_or_dead h2')
     emoji.innerHTML = HAPPY
     onInit()
@@ -393,4 +424,31 @@ function changeDiff(num) {
         default:
             break
     }
+}
+
+
+
+
+
+//cant finish UNDO
+//
+function UNDO() {
+    if (gUndo.length===0){
+        alert('there no step back')
+        return
+    }
+    var stageBack = gUndo.pop()
+    gGame = stageBack.gGame
+    gBoard = stageBack.gBoard
+    gLevel = stageBack.gLevel
+    renderBoard(gBoard, '.board')
+}
+//undo need
+function addToUndo() {
+    var infoSave = {
+        gGame: gGame,
+        gBoard: gBoard,
+        gLevel: gLevel
+    }
+    return infoSave
 }
