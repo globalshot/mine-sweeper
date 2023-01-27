@@ -1,15 +1,17 @@
 body {
     background-image: url("/img/jungle1.png");
     /* height: auto; */
-    /* width: auto; */  
+    /* width: auto; */
     /* background-position: center; */
     background-repeat: no-repeat;
-    background-size: cover;
+    /* background-size: cover; */
     position: relative;
 }
+
 table {
     margin: 20px auto;
 }
+
 tr,
 td {
     text-align: center;
@@ -29,7 +31,7 @@ footer {
     font-size: 20px;
 }
 
-span.game{
+span.game {
     background: none;
     display: grid;
     height: auto;
@@ -37,80 +39,114 @@ span.game{
     margin-left: auto;
     margin-right: auto;
 
-    
+
 }
 
 div.alive_or_dead h2 {
     margin: auto auto 10px;
     text-align: center;
 }
+
 div h2 span.lives_left {
     font-size: 30px;
     color: red;
     background-color: rgb(83, 59, 138);
 }
+
 div h2 {
     margin: 10px auto 20px;
     text-align: center;
 }
+
 .opened {
     background-color: green;
 }
+
 div.timer h2 {
     margin: 0px auto 10px;
     text-align: center;
 }
 
-div.difficulties{
+div.difficulties {
     margin-top: 0px;
     background-color: #5100ff;
     display: inline-flex;
 }
-p.p_difficulties{
+
+p.p_difficulties {
     font-size: 20px;
     margin-bottom: 5px;
     margin-top: 2px;
-    color: greenyellow;
+    color: #ff8f8f;
 }
-.manual{
+
+.manual {
     margin-top: 5px;
 }
-.using{
+
+.using {
     background-color: yellow;
 }
 
-button{
+button {
     margin-bottom: 2px;
     border-radius: 10px;
     height: 30px;
 }
+
 .easy {
     background: lightblue;
     color: white;
 }
+
 .medium {
     background: cyan;
 }
+
 .hard {
     background-color: purple;
     color: yellow;
 }
-div.manual_div{
+
+div.manual_div {
     display: table;
     background-color: teal;
     margin-top: 5px;
     margin-bottom: 2px;
 }
-div p{
+
+div p {
     font-size: 25px;
     color: black;
     size: 10px;
     margin-bottom: 4px
 }
-div.helping_tools{
+
+div.helping_tools {
     margin-top: 20px;
     display: table;
 }
-.safe_hint{
+
+.safe_hint {
     background-color: purple;
+}
+
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 70px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    /* padding: auto 6px; */
+    z-index: 1;
+}
+
+.dropdown:hover .dropdown-content {
+    display: inline-table;
 }

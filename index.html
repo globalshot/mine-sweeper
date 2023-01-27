@@ -14,10 +14,20 @@
 <body onload="onInit()">
     <h1>my mine sweeper</h1>
     <div class="difficulties">
+        <div class="dropdown">
+
         <p class="p_difficulties">difficulties:</p>
-        <button class="easy" onclick="changeDiff(1)">easy</button><br>
-        <button class="medium" onclick="changeDiff(2)">medium</button><br>
-        <button class="hard" onclick="changeDiff(3)">hard</button>
+
+        <div class="dropdown-content">
+
+            <button class="easy" onclick="changeDiff(1)">easy</button><br>
+            <button class="medium" onclick="changeDiff(2)">medium</button><br>
+            <button class="hard" onclick="changeDiff(3)">hard</button>
+            
+        </div>
+
+    </div>
+
     </div>
     <div class="manual_div"><button class="manual" onclick="manualPlace(this)">manual place mode</button></div>
     <div class="helping_tools">
