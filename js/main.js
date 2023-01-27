@@ -2,7 +2,8 @@
 
 const FLAG = '🚩'
 const BOMB = '💣'
-const UNCLICKED = '?'
+// const UNCLICKED = '?'
+const UNCLICKED = ''
 const HAPPY = '😄'
 const SAD = '💀'
 const WINNER = '🤗'
@@ -449,6 +450,11 @@ function changeDiff(num) {
         default:
             break
     }
+}
+function blackMode() {
+    var body = document.querySelector("body")
+    body.classList.toggle("black_mode")
+    body.classList.toggle("img")
 }
 
 
