@@ -19,19 +19,20 @@
         <button class="medium" onclick="changeDiff(2)">medium</button><br>
         <button class="hard" onclick="changeDiff(3)">hard</button>
     </div>
-
     <div class="manual_div"><button class="manual" onclick="manualPlace(this)">manual place mode</button></div>
     <div class="helping_tools">
-        <p style="color: black; size: 5px;">helping tools</p>
+        <p style="background: lightyellow; size: 5px;">helping tools</p>
         <button class="hints" onclick="hint(this)">hints: 3</button><br>
         <button class="safe" onclick="safeClick()">safe click: 3</button>
     </div>
     <!-- undo doesnt work yet -->
     <!-- <button onclick="UNDO()">UNDO</button> -->
 
+    <!-- TODO  in phone version, you need add double click, or add button for flags-->
+
     <!-- add bulbs for decoration of hints -->
     <!-- to understand what local storage is and for what i need it -->
-
+    <span class="game">
     <div class="alive_or_dead">
         <h2 onclick="newGame()">😄</h2>
     </div>
@@ -44,6 +45,7 @@
     <table>
         <tbody class="board"></tbody>
     </table>
+    </span>
     <br>
     <footer>
         <p>Steven Buchinsky</p>

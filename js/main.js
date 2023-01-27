@@ -383,6 +383,7 @@ function safeClick() {//while loop, random i and j, check if cell bomb or opened
             var selectorStr = `[data-i="${i}"][data-j="${j}"]`
             var elCell = document.querySelector(selectorStr)
             elCell.innerHTML = gBoard[i][j].minesAroundCount
+            elCell.classList.add("safe_hint")
             //TODO if the player clciks it, cancel the timeout, and just mark as opened
             setTimeout(() => { hideAgain(elCell, i, j) }, 2000)
             return
@@ -393,6 +394,7 @@ function hideAgain(elCell, i, j) {
     if (gBoard[i][j].isShown === false) {
         elCell.innerHTML = UNCLICKED
     }
+    elCell.classList.remove("safe_hint")
 }
 function newGame() {
     //restarting gGame

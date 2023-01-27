@@ -1,5 +1,11 @@
 body {
-    background-color: grey;
+    background-image: url("/img/jungle1.png");
+    /* height: auto; */
+    /* width: auto; */  
+    /* background-position: center; */
+    background-repeat: no-repeat;
+    background-size: cover;
+    position: relative;
 }
 table {
     margin: 20px auto;
@@ -23,6 +29,16 @@ footer {
     font-size: 20px;
 }
 
+span.game{
+    background: none;
+    display: grid;
+    height: auto;
+    /* width: max-content; */
+    margin-left: auto;
+    margin-right: auto;
+
+    
+}
 
 div.alive_or_dead h2 {
     margin: auto auto 10px;
@@ -94,4 +110,7 @@ div p{
 div.helping_tools{
     margin-top: 20px;
     display: table;
+}
+.safe_hint{
+    background-color: purple;
 }
