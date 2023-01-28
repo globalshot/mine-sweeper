@@ -1,14 +1,11 @@
 .img {
-    background-image: url("/images/jungle1.png");
-    /* height: auto; */
-    /* width: auto; */
-    /* background-position: center; */
+    /* people recommend doing it this way */
+    /* ![](/assets/image.jpg)  */
+    /* background-image: url("/images/jungle1.png"); */
+    background-image: url("/Assets/jungle1.png");
     background-repeat: no-repeat;
-    /* background-size: cover; */
-    /* position: relative; */
     position: initial;
-    /* margin: 0; */
-    
+
 }
 body{
     background-attachment:fixed;
