@@ -1,8 +1,7 @@
 .img {
     /* people recommend doing it this way */
     /* ![](/assets/image.jpg)  */
-    /* background-image: url("/images/jungle1.png"); */
-    background-image: url("/Assets/jungle1.png");
+    background-image: url("/images/jungle1.png");
     background-repeat: no-repeat;
     position: initial;
 
