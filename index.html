@@ -1,70 +1,98 @@
 <!DOCTYPE html>
-
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>meme page</title>
     <link rel="stylesheet" href="css/main.css">
-    <title>Mine Sweeper</title>
-    <script>document.addEventListener('contextmenu', event => event.preventDefault());</script>
+    <link rel="stylesheet" href="css/editor.css">
+    <link rel="stylesheet" href="css/gallery.css"> 
+    <link rel="stylesheet" href="css/mq.css"> 
 </head>
 
-<body class="img" onload="onInit()">
-    <h1 style="color: white;">my mine sweeper</h1>
-    <div class="difficulties">
-        <div class="dropdown">
-
-        <p class="p_difficulties">difficulties:</p>
-
-        <div class="dropdown-content">
-
-            <button class="easy" onclick="changeDiff(1)">easy</button><br>
-            <button class="medium" onclick="changeDiff(2)">medium</button><br>
-            <button class="hard" onclick="changeDiff(3)">hard</button>
-            
+<body onload="renderGallery()">
+    <nav class="navbar">
+        <a href="" class="logo">logo</a>
+        <div>
+            <a onclick="toggleGallery()">Gallery</a>
+            <a onclick="toggleAboutMe()">about me</a>
         </div>
+    </nav>
+    <div class="modal">
+        <section class="images"></section>
+    </div>
+    <div class="aboutMe hidden">
+        <section class="me"></section>
+        <!-- i hard code here -->
+    </div>
+    <section class="main-grid">
+        <div class="canvas-container">
+        <!-- <canvas class="canvas canvas-img"></canvas>
+        <canvas class="canvas canvas-text"></canvas>
+        <canvas class="canvas canvas-saved"></canvas> -->
+        <canvas class="canvas canvas-download" height="400" width="400"></canvas>
+        <canvas class="canvas canvas-img" height="400" width="400"></canvas>
+        <canvas class="canvas canvas-text" height="400" width="400"></canvas>
+        <canvas class="canvas canvas-saved" height="400" width="400"></canvas>
+        </div>
+        <form id="form" onsubmit="return false;">
+            <!-- <input id="text-line" type="text" placeholder="Text line"> -->
+            <textarea id="text-line" name="story" rows="5" cols="33" placeholder="enter text"></textarea>
+            <br>
 
-    </div>
+            <input type="button" onclick="changeY(1)" value="&#8595;"><!--move down line-->
+            <input type="button" onclick="changeY(-1)" value="&#8593;"><!--move up line-->
+            <input type="button" onclick="changeX(-1)" value="&#8592;"><!--move up line-->
+            <input type="button" onclick="changeX(1)" value="&#8594;"><!--move down line-->
+            <br>
+            <input type="button" onclick="lineFocus()" value="&#8645;"><!--change line focus-->
+            <input type="button" onclick="onLineAdd()" value="add line"><!--add line-->
+            <input type="button" onclick="onLineDelete()" value="delete line"><!--delete line-->
+            <br>
+            
+            <input type="button" onclick="changeSize(1)" value="A&#8593;"><!--text bigger-->
+            <input type="button" onclick="changeSize(-1)" value="A&#8595;"><!--text smaller-->
+            <input class="red" type="button" onclick="onChangeAlignment('left')" value="aligment left"><!--allgment left-->
+            <input class="red" type="button" onclick="onChangeAlignment('center')" value="aligment center"><!--aligment center-->
+            <input class="red" type="button" onclick="onChangeAlignment('right')" value="aligment right"><!--aligment right-->
+            <br>
+            <!-- <select onchange="onSetLang(this.value)"> -->
+            <!-- <select class="red" onchange="console.log(this.value)">
+                <option value="en">English</option>
+                <option value="he">עברית</option>
+            </select> -->
+            <!-- <input class="red" type="button" value="border size?">text border size? -->
+            <input id="color-btn" type="color" onchange="setLineColor((this.value))"><!--color-->
+            <br>
 
-    </div>
-    <div class="manual_div"><button class="manual" onclick="manualPlace(this)">manual place mode</button></div>
-    <div class="helping_tools">
-        <p style="background: lightyellow; size: 5px;">helping tools</p>
-        <button class="hints" onclick="hint(this)">hints: 3</button><br>
-        <button class="safe" onclick="safeClick()">safe click: 3</button>
-    </div>
-    <!-- undo doesnt work yet -->
-    <!-- <button onclick="UNDO()">UNDO</button> -->
+            <!-- stickers -->
 
-    <!-- TODO  in phone version, you need add double click, or add button for flags-->
+            <input type="file" id="img-upload">
+            <br>
+            <input class="red" type="button" value="share" onclick="onUploadImg()"><!--share-->
+            <a href="#" onclick="downloadCanvas(this)">Download</a>
+            <p>red colored dont work yet</p>
 
-    <!-- add bulbs for decoration of hints -->
-    <!-- to understand what local storage is and for what i need it -->
-    <span class="game">
-    <div class="alive_or_dead">
-        <h2 onclick="newGame()">😄</h2>
-    </div>
-    <div class="timer">
-        <h2>0 seconds</h2>
-    </div>
-    <div>
-        <h2><span class="flags_left">flags left:</span>&emsp;<span class="lives_left"></span></h2>
-    </div>
-    <table>
-        <tbody class="board"></tbody>
-    </table>
-    </span>
-    <button class="color_change" onclick="blackMode()">black mode</button>
-    <footer>
-        <p>Steven Buchinsky</p>
-    </footer>
-    <script src="js/utils.js"></script>
-    <script src="js/showInfo.js"></script>
-    <script src="js/features.js"></script>
-    <script src="js/boardClicks.js"></script>
-    <script src="js/main.js"></script>
+            <!-- <input type="range" id="rotation-range" min="-180" max="180" step="1" value="0"> -->
+        </form>
+    </section>
+    
+    <footer class="footer">all right reserved 2023</footer>
+
+    <script src="js/aboutme-controller.js"></script>
+    <script src="js/services/storage-service.js"></script>
+    <script src="js/services/meme-service.js"></script>
+    <script src="js/gallery-controller.js"></script>
+    <script src="js/meme-controller.js"></script>
+    <script src="js/sharing-on-facebook.js"></script>
+
+    <!-- 
+    chatGPT, talk with him and learn, find solution to drag and drop,
+    ofc ask lots of questions and learn from him, dont forget the UI for
+    the memes, and rotate and etc -->
 </body>
 
 </html>
+
+<!-- idk about github, that gonna overload pc i guess and i kinda hate the idea -->
